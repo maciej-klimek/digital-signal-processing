@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 
+# TO TRZEBA SKONCZYC
+
 data = scipy.io.loadmat('adsl_x.mat')
 x = np.array(data['x'])
 
