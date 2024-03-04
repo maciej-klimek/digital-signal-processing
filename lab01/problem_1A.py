@@ -10,9 +10,8 @@ time = np.arange(0, duration, 1/sampling_frequencies[0])
 
 signals = []
 for fs in sampling_frequencies:
-    time_domain = np.arange(0, duration, 1/fs)
-    sin_wave = sin_amplitude * \
-        np.sin(2 * np.pi * sin_frequency * time_domain)
+    time_domain = np.arange(0, duration, 1/fs)      #ównomiernie rozmieszczone wartosci z danym skokiem na zakresie
+    sin_wave = sin_amplitude * np.sin(2 * np.pi * sin_frequency * time_domain)
     signals.append((time_domain, sin_wave))
 
 plt.figure(figsize=(10, 6))
