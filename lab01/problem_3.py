@@ -36,13 +36,13 @@ prefix_length = 32
 frame_length = 512
 package_length = prefix_length + frame_length
 
-max_correlation = 0
+best_correlation = 0
 prefix_positions = np.zeros((3, 1))       # wiemy że są 3 prefiksy - trzeba znalezc takie pozycje startu prefixow, dla których suma 3 korelancji będzie najbliższa 1 (najwieksza)
 
 for i in range(len(signal) // 3):               # wiemy że sygnał składa sie z powtarzających sie bloków (jeden po drugim), wiec badając jego 1/3 w praktyce zbadamy cały
     if (i + 3 * package_length) > len(signal):
         break
-    max_corr_group = 0
+    group_correlation = 0
     tmp_positions = np.zeros((3, 1))
 
     for j in range(3):          # sprawdzamy 3 kolejne potencjalne prefiksy
@@ -55,19 +55,19 @@ for i in range(len(signal) // 3):               # wiemy że sygnał składa sie 
 
         corr = get_correlation(prefix, shifted_data_block)
         # print(np.mean(corr))
-        max_corr_group += np.mean(corr)
+        group_correlation += np.mean(corr)
 
-    if max_corr_group > max_correlation:        
-        max_correlation = max_corr_group
+    if group_correlation > best_correlation:        
+        best_correlation = group_correlation
         prefix_positions = tmp_positions
     # print(max_correlation)
 
 # Wykres
 plt.figure(figsize=(10, 6))
-plt.plot(signal, "b-", label='Sygnał')
+plt.plot(signal, "r-", label='Sygnał ADSL')
 for i in range(3):
-    plt.plot(prefix_positions[i, 0], 0, 'y*', label='Początek prefiksu' if i == 0 else "")
-plt.title('Znalezienie początku prefiksu')
+    plt.plot(prefix_positions[i, 0], 0, 'k*', label='Znaleziony początek prefiksu')
+plt.title('Znajdowanie prefiksów w sygnale ADSL')
 plt.xlabel('Indeks próbki')
 plt.ylabel('Amplituda')
 plt.legend()
