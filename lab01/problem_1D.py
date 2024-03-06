@@ -45,7 +45,6 @@ ax[1].legend()
 ax[1].grid(True)
 
 plt.tight_layout()
-plt.show()
 
 
 # plt.figure(figsize=(10, 6))
