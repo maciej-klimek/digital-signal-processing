@@ -10,25 +10,25 @@ def get_correlation(x, y):
     x_mean = np.mean(x)
     y_mean = np.mean(y)
 
-    x_std = np.std(x)
+    x_std = np.std(x)       # odchylenie standardowe dwóch arrayow
     y_std = np.std(y)
 
-    result = np.zeros(n + m - 1)
-    delay = np.arange(-n + 1, m)
+    result_array = np.zeros(n + m - 1)
+    shift_positions = np.arange(-n + 1, m)      # array zawierający przesunięcia z jakimi będziemy badać x i y
 
-    for i in range(len(result)):
-        if delay[i] < 0:
-            result[i] = np.sum((x[0:n + delay[i]] - x_mean) * (y[-delay[i]:m] - y_mean))
-        elif delay[i] == 0:
-            result[i] = np.sum((x - x_mean) * (y - y_mean))
+    # dla każdego opóźnienia : 
+    for i in range(len(shift_positions)):      
+        if shift_positions[i] < 0:
+            result_array[i] = np.sum((x[0:n + shift_positions[i]] - x_mean) * (y[-shift_positions[i]:m] - y_mean))      # obliczamy sume iloczynu znormalizowanych punktów x i y
+        elif shift_positions[i] == 0:
+            result_array[i] = np.sum((x - x_mean) * (y - y_mean))
         else:
-            result[i] = np.sum((x[delay[i]:n] - x_mean) * (y[0:m - delay[i]] - y_mean))
+            result_array[i] = np.sum((x[shift_positions[i]:n] - x_mean) * (y[0:m - shift_positions[i]] - y_mean))
 
-        result[i] = result[i] / (x_std * y_std * (n - abs(delay[i])))
+        result_array[i] = result_array[i] / (x_std * y_std * (n - abs(shift_positions[i])))     # i dzielimy przez odchylenie standardowe dwoch arrayow
 
-    return result
+    return result_array
 
-# Wczytanie danych
 data = scipy.io.loadmat('adsl_x.mat')
 signal = np.array(data['x'])
 
@@ -37,34 +37,36 @@ frame_length = 512
 package_length = prefix_length + frame_length
 
 max_correlation = 0
-start_prefix_positions = np.zeros((3, 1))       # wiemy że są 3 prefiksy 
+prefix_positions = np.zeros((3, 1))       # wiemy że są 3 prefiksy - trzeba znalezc takie pozycje startu prefixow, dla których suma 3 korelancji będzie najbliższa 1 (najwieksza)
 
-for i in range(len(signal) // 3):
+for i in range(len(signal) // 3):               # wiemy że sygnał składa sie z powtarzających sie bloków (jeden po drugim), wiec badając jego 1/3 w praktyce zbadamy cały
     if (i + 3 * package_length) > len(signal):
         break
-
     max_corr_group = 0
-    tmp_start_prefix_positions = np.zeros((3, 1))
+    tmp_positions = np.zeros((3, 1))
 
-    for j in range(3):
+    for j in range(3):          # sprawdzamy 3 kolejne potencjalne prefiksy
         prefix = signal[i + j * package_length: i + j * package_length + prefix_length]
-        tmp_start_prefix_positions[j, 0] = i + j * package_length
+        # print(prefix)
+        tmp_positions[j, 0] = i + j * package_length 
 
-        copy_probe_block = signal[i + j * package_length + frame_length:
+        shifted_data_block = signal[i + j * package_length + frame_length:                  # !!! blok danych przesunięty o dlugosc całej ramki - clue algorytmu - sprawdzamy suma 3 korelancji
                                   i + j * package_length + frame_length + prefix_length]
 
-        corr = get_correlation(prefix, copy_probe_block)
+        corr = get_correlation(prefix, shifted_data_block)
+        # print(np.mean(corr))
         max_corr_group += np.mean(corr)
 
-    if max_corr_group > max_correlation:
+    if max_corr_group > max_correlation:        
         max_correlation = max_corr_group
-        start_prefix_positions = tmp_start_prefix_positions
+        prefix_positions = tmp_positions
+    # print(max_correlation)
 
 # Wykres
 plt.figure(figsize=(10, 6))
 plt.plot(signal, "b-", label='Sygnał')
 for i in range(3):
-    plt.plot(start_prefix_positions[i, 0], 0, 'y*', label='Początek prefiksu' if i == 0 else "")
+    plt.plot(prefix_positions[i, 0], 0, 'y*', label='Początek prefiksu' if i == 0 else "")
 plt.title('Znalezienie początku prefiksu')
 plt.xlabel('Indeks próbki')
 plt.ylabel('Amplituda')

@@ -1,36 +1,37 @@
-### Podpunkt C1 - sinus
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.io
 
-def plot_sinusoids(frequencies, title, legend=True):
-    fs = 100  # częstotliwość próbkowania
-    t = np.arange(0, 1, 1/fs)  # os czasu dla 1 sekundy sygnału
+def get_correlation(x, y):
 
-    # Pętla generująca wykresy dla podanych częstotliwości
-    for f in frequencies:
-        x = np.sin(2 * np.pi * f * t)  # generowanie sinusoidy o zadanej częstotliwości
-        plt.plot(t, x)  # wyświetlanie sinusoidy
-        # plt.pause(1)
+    n = len(x)
+    m = len(y)
 
-    plt.xlabel('Czas [s]')
-    plt.ylabel('Amplituda')
-    plt.title(title)
-    if legend:
-      plt.legend([f'{f} Hz' for f in frequencies])
-    plt.show()
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
 
-# Wygenerowanie wykresów dla różnych częstotliwości
-frequencies = range(0, 301, 5)
-plot_sinusoids(frequencies, 'Wykresy sinusoid', False)
+    x_std = np.std(x)
+    y_std = np.std(y)
 
-# Wykres porównujący sinusoidy o różnych częstotliwościach
-frequencies = [5, 105, 205]
-plot_sinusoids(frequencies, 'Porównanie sinusoid o różnych częstotliwościach')
+    result = np.zeros(n + m - 1)
+    delay = np.arange(-n + 1, m)
+    print(delay)
 
-# Wykres porównujący sinusoidy o różnych częstotliwościach
-frequencies = [95, 195, 295]
-plot_sinusoids(frequencies, 'Porównanie sinusoid o różnych częstotliwościach')
+    for i in range(len(result)):
+        if delay[i] < 0:
+            result[i] = np.sum((x[0:n + delay[i]] - x_mean) * (y[-delay[i]:m] - y_mean))
+        elif delay[i] == 0:
+            result[i] = np.sum((x - x_mean) * (y - y_mean))
+        else:
+            result[i] = np.sum((x[delay[i]:n] - x_mean) * (y[0:m - delay[i]] - y_mean))
 
-# Wykres porównujący sinusoidy o bliskich częstotliwościach
-frequencies = [95, 105]
-plot_sinusoids(frequencies, 'Porównanie sinusoid o bliskich częstotliwościach')
+        result[i] = result[i] / (x_std * y_std * (n - abs(delay[i])))
+
+    return result
+
+
+x = [1, 2, 3]
+y = [1, 4, 3]
+
+get_correlation(x, y)
+print(get_correlation(x, y))
