@@ -1,8 +1,5 @@
 import numpy as np
 
-# tylko po to żeby wyświetlać długi format liczb
-np.set_printoptions(suppress=True, floatmode='fixed')
-
 def generate_DCT(N):
     s = np.sqrt(1/N)
     w = np.zeros((N, N))
@@ -13,9 +10,6 @@ def generate_DCT(N):
             else:
                 w[k, n] = np.sqrt(2/N) * np.cos((np.pi * k * (2*n + 1)) / (2 * N))
     return w
-
-size = 20
-A = generate_DCT(size)
 
 def check_orthonormality(matrix):
     N = len(matrix)
@@ -33,9 +27,36 @@ def check_orthonormality(matrix):
                     return False
     return True
 
-print(A)
+size = 20
 
-if check_orthonormality(A):
-    print("Macierz jest ortonormalna.")
+A = generate_DCT(size)
+S = np.transpose(A)
+I = np.dot(S, A)
+
+
+if np.allclose(I, np.eye(size)):
+    print("Iloczyn AS jest macierzą identycznościową.")
 else:
-    print("Macierz nie jest ortonormalna.")
+    print("Iloczyn AS nie jest macierzą identycznościową.")
+
+print()
+
+x_rand = np.random.rand(size)
+print("Sygnał wygenerowany losowo: ", x_rand)
+
+x_rand_A = np.dot(A, x_rand)
+x_rec = np.dot(S, x_rand_A)
+print("Sygnał zrekonstruowany: ", x_rec)
+
+rec_error = np.max(np.abs(x_rand - x_rec))
+                   
+print()                   
+print(f"Błąd rekonstrukcji wynosi: {rec_error}.")
+
+if np.allclose(x_rec, x_rand):
+    print("Transformacja posiada właściwość perfekcyjnej rekonstrukcji.")
+else:
+    print("Transformacja nie posiada właściwości perfekcyjnej rekonstrukcji.")
+
+
+

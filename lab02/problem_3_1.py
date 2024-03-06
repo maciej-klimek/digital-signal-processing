@@ -17,14 +17,14 @@ fs = 1000
 
 def generate_DCT(N):
     s = np.sqrt(1/N)
-    A = np.zeros((N, N))
+    w = np.zeros((N, N))
     for k in range(N):
         for n in range(N):
             if k == 0:
-                A[k, n] = s * np.cos(np.pi * k / N * (n + 0.5))
+                w[k, n] = np.sqrt(1/N)
             else:
-                A[k, n] = np.sqrt(2/N) * np.cos(np.pi * k / N * (n + 0.5))
-    return A
+                w[k, n] = np.sqrt(2/N) * np.cos((np.pi * k * (2*n + 1)) / (2 * N))
+    return w
 
 def generate_IDCT(N):
     s = np.sqrt(1/N)
