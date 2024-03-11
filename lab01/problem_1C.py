@@ -13,11 +13,11 @@ plt.figure(figsize=(10, 6))
 plot_handle = None
 
 for sin_frequency in range(0, 301, 5):
-    bckg_signal = amplitude * np.sin(2 * np.pi * sin_frequency * bckg_time_domain)          # zmiena funkcji na cos
+    bckg_signal = amplitude * np.sin(2 * np.pi * sin_frequency * bckg_time_domain)          # zmien funkcji na cos
     sample_values = amplitude * np.sin(2 * np.pi * sin_frequency * time_domain)
 
     plt.clf()
-
+    print(sample_values)
     plt.plot(bckg_time_domain, bckg_signal, "-", color="#bababa",  label="Poglądawy wykres")
     plt.plot(time_domain, sample_values, "r-", label=f"Sygnał spróbkowany")
     plt.scatter(time_domain, sample_values, color='red')

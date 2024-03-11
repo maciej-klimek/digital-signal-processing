@@ -56,7 +56,7 @@ plt.title('Moduł widma')
 
 # Faza
 plt.subplot(2, 2, 4)
-plt.plot(freq, np.unwrap(np.angle(X)))  # dodanie unwrapplt.xlabel('Częstotliwość [Hz]')
+plt.phase_spectrum(freq, X)  # dodanie unwrapplt.xlabel('Częstotliwość [Hz]')
 plt.ylabel('Faza')
 plt.title('Faza widma')
 

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 sin_frequency = 2
-# sin_frequency = 10
+# sin_frequency = 50
 sampling_frequency = 50
 # sampling_frequency = 200
 
