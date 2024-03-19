@@ -48,7 +48,7 @@ for i in range(K):
     else:
         j = i
         s = 0
-    ax[j, s].plot(frequencies, abs(spectrum))
+    ax[j, s].plot(frequencies, abs(spectrum), "g-o")
     ax[j, s].set_title("Ramka numer {}".format(i+1))
 
 plt.tight_layout()

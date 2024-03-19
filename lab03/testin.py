@@ -1,96 +1,79 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Parametry sygnału
-A1 = 100
-f1 = 100
-phi1 = np.pi / 7
-A2 = 200
-f2 = 200
-phi2 = np.pi / 11
-fs = 1000  # częstotliwość próbkowania
-N = 100    # liczba próbek
+N = 100  # liczba próbek
+fs = 1000  # częstotliwość próbkowania [Hz]
 
-def DFT_matrix(N):
-    i, j = np.meshgrid(np.arange(N), np.arange(N))
-    omega = np.exp( - 2 * np.pi * 1J / N )
-    W = np.power( omega, i * j ) / np.sqrt(N)
-    return W
-A=DFT_matrix(N)
+f1 = 125  # częstotliwość pierwszej składowej [Hz]
+A1 = 100  # amplituda pierwszej składowej
+phi1 = np.pi / 7  # kąt fazowy pierwszej składowej
 
-# Tworzenie wektora czasu
-t = np.arange(N) / fs
+f2 = 200  # częstotliwość drugiej składowej [Hz]
+A2 = 200  # amplituda drugiej składowej
+phi2 = np.pi / 11  # kąt fazowy drugiej składowej
 
-# Obliczanie sygnału x(t)
-x_t = x_t = A1 * np.cos(2 * np.pi * f1 * t + phi1) + A2 * np.cos(2 * np.pi * f2 * t + phi2)
+# Generowanie sygnału x(t)
+t = np.arange(N) / fs  # wektor czasu
+x = A1 * np.cos(2 * np.pi * f1 * t + phi1) + A2 * np.cos(2 * np.pi * f2 * t + phi2)
 
-# Obliczanie DFT sygnału x(t)
-X = np.dot(A, x_t)
-# Wyliczanie widma
-freq= np.arange(N)* fs/N
-real_part = np.real(X)
-imaginary_part = np.imag(X)
-magnitude = np.abs(X)
-phase = np.angle(X)
+# Dodanie M zer na końcu sygnału
+M = 100
+xz = np.concatenate((x, np.zeros(M)))
 
-# Narysowanie widma
-plt.figure(figsize=(12, 10))
+# Obliczenie X1
+X1 = np.fft.fft(x) / N
 
-plt.subplot(2, 2, 1)
-plt.plot(freq, real_part, color='blue')
-plt.title('Część rzeczywista')
-plt.xlabel('Częstotliwość [Hz]')
-plt.grid()
+# Obliczenie X2
+X2 = np.fft.fft(xz) / (N + M)
 
-plt.subplot(2, 2, 2)
-plt.plot(freq, imaginary_part, color='red')
-plt.title('Część urojona')
-plt.xlabel('Częstotliwość [Hz]')
-plt.grid()
+# Obliczenie X3
+f = np.arange(0, 1001, 0.25)  # wektor częstotliwości
+X3 = np.zeros(len(f), dtype=np.complex128)
+for i, freq in enumerate(f):
+    X3[i] = 1/N * np.sum(x * np.exp(-1j * 2 * np.pi * freq / fs * np.arange(N)))
 
-plt.subplot(2, 2, 3)
-plt.plot(freq, magnitude, color='purple')
-plt.title('Moduł')
-plt.xlabel('Częstotliwość [Hz]')
-plt.grid()
+# Przeskalowanie widm
+X1 = np.abs(X1)
+X2 = np.abs(X2)
+X3 = np.abs(X3)
 
-plt.subplot(2, 2, 4)
-plt.phase_spectrum(t, X, color='green')
-plt.title('Faza')
-plt.xlabel('Częstotliwość [Hz]')
-plt.grid()
+# Wektory częstotliwości
+fx1 = fs * np.arange(N) / N
+fx2 = fs * np.arange(N + M) / (N + M)
+fx3 = f
 
-plt.tight_layout()
-
-
-# Wyznaczanie macierzy rekonstrukcji B
-B = np.conj(A).T
-xr=np.dot(B, X)
-# Rekonstrukcja sygnału na podstawie X
-# Wizualizacja porównania sygnałów
+# Rysowanie widm
 plt.figure(figsize=(10, 6))
-plt.plot(t, x_t, label='Oryginalny sygnał x(t)', linestyle='-', color='blue')
-plt.plot(t, xr, label='Zrekonstruowany sygnał xr(t)', linestyle='--', color='red')
-plt.xlabel('Czas [s]')
+plt.plot(fx1, X1, 'o-', label='$X_1$ (DFT o długości N)')
+plt.plot(fx2, X2, 'r-x', label='$X_2$ (DFT z dodaniem zer)')
+plt.plot(fx3, X3, 'k-', label='$X_3$ (DtFT)')
+plt.xlabel('Częstotliwość [Hz]')
 plt.ylabel('Amplituda')
-plt.title('Porównanie oryginalnego sygnału z zrekonstruowanym używając macierzy rekonstukcji')
+plt.title('Porównanie trzech widm')
 plt.legend()
-plt.grid()
+plt.grid(True)
+plt.show()
 
+# Obliczenie X3 dla szerszego zakresu częstotliwości
+f_extended = np.arange(-2000, 2000.25, 0.25)
+X3_extended = np.zeros(len(f_extended), dtype=np.complex128)
+for i, freq in enumerate(f_extended):
+    X3_extended[i] = 1/N * np.sum(x * np.exp(-1j * 2 * np.pi * freq / fs * np.arange(N)))
 
+# Przeskalowanie X3 dla szerszego zakresu
+X3_extended = np.abs(X3_extended)
 
-X=np.fft.fft(x_t)
-xr=np.fft.ifft(X)
-# Rekonstrukcja sygnału na podstawie X
-# Wizualizacja porównania sygnałów
+# Wektory częstotliwości dla szerszego zakresu
+fx3_extended = f_extended
+
+# Rysowanie widm dla szerszego zakresu
 plt.figure(figsize=(10, 6))
-plt.plot(t, x_t, label='Oryginalny sygnał x(t)', linestyle='-', color='blue')
-plt.plot(t, xr, label='Zrekonstruowany sygnał xr(t)', linestyle='--', color='red')
-plt.xlabel('Czas [s]')
+plt.plot(fx1, X1, 'o', label='$X_1$ (DFT o długości N)')
+plt.plot(fx2, X2, 'r-x', label='$X_2$ (DFT z dodaniem zer)')
+plt.plot(fx3_extended, X3_extended, 'k-', label='$X_3$ (DtFT) dla szerszego zakresu')
+plt.xlabel('Częstotliwość [Hz]')
 plt.ylabel('Amplituda')
-plt.title('Porównanie oryginalnego sygnału z zrekonstruowanym używając FFT')
+plt.title('Porównanie trzech widm (szerszy zakres częstotliwości)')
 plt.legend()
-plt.grid()
-
-
+plt.grid(True)
 plt.show()

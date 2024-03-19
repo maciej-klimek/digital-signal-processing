@@ -12,7 +12,7 @@ f2 = 125  # częstotliwość drugiej składowej [Hz]
 # f2 = 250  # częstotliwość drugiej składowej [Hz]
 A1 = 1  # amplituda pierwszej składowej
 A2 = 0.0001  # amplituda drugiej składowej
-# A2 = 0.5  # amplituda drugiej składowej
+# A2 = 0.5  # zwiększona amplituda drugiej składowej
 
 # Generowanie sygnału x(t)
 t = np.arange(N) / fs  # wektor czasu
@@ -31,14 +31,13 @@ plt.ylabel('Moduł')
 plt.title('Widmo sygnału przed zastosowaniem okien')
 plt.grid(True)
 
-# Okna
+# Okno czasowe – funkcja opisująca sposób pobierania próbek z sygnału. -> https://pl.wikipedia.org/wiki/Okno_czasowe
 windows = ['Prostokątne', 'Hamminga', 'Blackmana', 'Czebyszewa (100 dB)', 'Czebyszewa (120 dB)']
-alpha_values = [None, 0.54, 0.42, None, None]  # Wartości współczynnika alfa dla poszczególnych okien
 ripple_values = [None, None, None, 100, 120]  # Wartości tłumienia dla okna Czebyszewa
 
 plt.figure(figsize=(10, 6))
 
-for window, alpha, ripple in zip(windows, alpha_values, ripple_values):
+for window, ripple in zip(windows, ripple_values):
     if window == 'Prostokątne':
         window_func = np.ones(N)
     elif window == 'Hamminga':

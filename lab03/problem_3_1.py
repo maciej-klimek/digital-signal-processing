@@ -3,11 +3,10 @@ import matplotlib.pyplot as plt
 from scipy.signal.windows import chebwin
 
 # Definicja stałych
-N = 100  # liczba próbek
-N_extended = 1000  # nowa liczba próbek
+N = 1000  # zmieniona liczba próbek
 fs = 1000  # częstotliwość próbkowania [Hz]
 
-f = np.arange(0, 500.1, 0.1)  # osie częstotliwości dla DtFT
+f = np.arange(50.1, 150.1, 0.1)  # zmienione osie częstotliwości dla DtFT
 f1 = 100  # częstotliwość pierwszej składowej [Hz]
 f2 = 125  # częstotliwość drugiej składowej [Hz]
 A1 = 1  # amplituda pierwszej składowej
