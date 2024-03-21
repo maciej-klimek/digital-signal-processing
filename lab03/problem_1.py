@@ -53,11 +53,11 @@ plt.xlabel('Częstotliwość [Hz]')
 plt.ylabel('Moduł')
 plt.title('Moduł widma')
 
-# Faza
-plt.subplot(2, 2, 4)
-plt.phase_spectrum(freq, X)
-plt.ylabel('Faza')
-plt.title('Faza widma')
+# # Faza
+# plt.subplot(2, 2, 4)
+# plt.phase_spectrum(freq, X)
+# plt.ylabel('Faza')
+# plt.title('Faza widma')
 
 
 fig = plt.figure(figsize=(10, 6))
