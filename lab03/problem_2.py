@@ -54,6 +54,21 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+
+# Rysowanie widm
+X2 = np.fft.fft(xz) / N
+X2 = np.abs(X2)
+
+plt.figure(figsize=(10, 6))
+plt.plot(fx2, X2, 'r-x', label='$X_2$ (DFT z dodaniem zer)')
+plt.plot(fx1, X1, 'o-', label='$X_1$ (DFT o długości N)')
+plt.xlabel('Częstotliwość [Hz]')
+plt.ylabel('Amplituda')
+plt.title('Porównanie trzech widm')
+plt.legend()
+plt.grid(True)
+plt.show()
+
 # Obliczenie X3 dla szerszego zakresu częstotliwości
 f_extended = np.arange(-2000, 2000.25, 0.25)
 X3_extended = np.zeros(len(f_extended), dtype=np.complex128)
