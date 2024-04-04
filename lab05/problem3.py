@@ -32,11 +32,11 @@ frequnecy_response_ellip = freqs(b_ellip, a_ellip, w)[1]
 poles_ellip = tf2zpk(b_ellip, a_ellip)[1]
 
 plt.figure()
-plt.plot(w / (2e3 * np.pi), 20 * np.log10(np.abs(frequnecy_response_butter)))
-plt.plot(w / (2e3 * np.pi), 20 * np.log10(np.abs(frequnecy_response_cheby1)))
-plt.plot(w / (2e3 * np.pi), 20 * np.log10(np.abs(frequnecy_response_cheby2)))
-plt.plot(w / (2e3 * np.pi), 20 * np.log10(np.abs(frequnecy_response_ellip)))
-plt.axis([0, 256, -40, 5])
+plt.plot(w / (2000 * np.pi), 20 * np.log10(np.abs(frequnecy_response_butter)))
+plt.plot(w / (2000 * np.pi), 20 * np.log10(np.abs(frequnecy_response_cheby1)))
+plt.plot(w / (2000 * np.pi), 20 * np.log10(np.abs(frequnecy_response_cheby2)))
+plt.plot(w / (2000 * np.pi), 20 * np.log10(np.abs(frequnecy_response_ellip)))
+plt.axis([0, 256, -40, 10])
 plt.grid()
 plt.title("Odpowiedź częstotliwościowa modelów")
 plt.xlabel("Częstotliwość (kHz)")
