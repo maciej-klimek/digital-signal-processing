@@ -1,91 +1,77 @@
-import numpy as np
 import scipy.io as sio
-import scipy.signal as signal
+import numpy as np
+from scipy import signal
 import matplotlib.pyplot as plt
 
 # Wczytanie danych z pliku .mat
 data = sio.loadmat('lab08_am.mat')
 
 # Wybierz numer realizacji sygnału zależny od przedostatniej cyfry w twojej legitymacji studenckiej
-realizacja = 3  # Przykładowy numer realizacji sygnału
+data_number = 3  # Przykładowy numer realizacji sygnału
 
 # Pobranie sygnału z wybranej realizacji
-x = data["s{}".format(realizacja)][0]
+x = data["s{}".format(data_number)][0]
 
-# Długość sygnału
-N = len(x)
+sampling_frequency = 1000
+carrier_frequency = 200
+filter_lenght = 64
+N = 2 * filter_lenght + 1
+coeffs_index = np.arange(1, filter_lenght + 1)
+coeffs = (2 / np.pi) * (np.sin(np.pi * coeffs_index / 2) ** 2 / coeffs_index)
+coeffs = np.concatenate((-coeffs[::-1], [0], coeffs))
 
-# Założenie domyślnej częstotliwości próbkowania
-fs = 1000  # Hz
+# Wymnożenie przez okno Blackmana
+blackman_window = signal.windows.blackman(N)
+windowed_coeffs = coeffs * blackman_window
 
-# Czas trwania
-t = np.arange(N) / fs
+# Filtracja
+y = np.convolve(x, windowed_coeffs, mode='valid')
+f_x = x[filter_lenght: -filter_lenght]
+envelope = np.sqrt(f_x ** 2 + y ** 2)
 
-# Parametry filtru Hilberta
-fc = 10  # Częstotliwość odcięcia filtru Hilberta
+fft_envelope = np.fft.fft(envelope)
 
-# Projektowanie filtru FIR jako przybliżenia filtru Hilberta
-nyquist = 0.5 * fs
-taps = 1001  # Długość odpowiedzi impulsowej filtra FIR
-taps_half = taps // 2
-taps_odd = taps % 2 == 1
-h = signal.firwin(taps, fc / nyquist, window=('kaiser', 14), pass_zero=False)
+# Znormalizowanie amplitud w widmie
+fft_envelope_norm = np.abs(fft_envelope) * 2 / np.max(np.abs(fft_envelope))
 
-# Filtracja sygnału x filtrem Hilberta
-x_hilbert = signal.convolve(x, h, mode='same')
 
-# Przesunięcie fazowe o -π/2 radianów
-if taps_odd:
-    x_hilbert = np.roll(x_hilbert, -taps_half)
-else:
-    x_hilbert = np.roll(x_hilbert, -taps_half - 1)
+# Wyświetlenie FFT sygnału obwiedni
+plt.figure()
+plt.plot(np.abs(fft_envelope_norm))
+plt.title('FFT obwiedni')
+plt.xlabel('Indeks częstotliwości')
+plt.ylabel('Znormalizowana amplituda')
+plt.grid()
 
-# Obliczenie obwiedni
-envelope = np.abs(x + 1j * x_hilbert)
+# Parametry sygnału modulującego
+f1 = 3
+f2 = 10
+f3 = 60
+A1 = 0.6
+A2 = 0.1
+A3 = 0.20
 
-# Analiza częstotliwościowa obwiedni
-fft_envelope = np.abs(np.fft.fft(envelope))
-frequencies = np.fft.fftfreq(N, 1 / fs)
+# Sygnał modulujący
+t = np.linspace(0, 1, sampling_frequency, endpoint=False)
+x_reconstructed = 1 + A1 * np.cos(2 * np.pi * f1 * t) + A2 * np.cos(2 * np.pi * f2 * t) + A3 * np.cos(2 * np.pi * f3 * t)
+x_reconstructed = x_reconstructed[filter_lenght: -filter_lenght]
 
-# Znalezienie indeksów dodatnich częstotliwości w widmie obwiedni
-positive_freq_indices = np.where(frequencies > 0)[0]
 
-# Znalezienie maksymalnej dodatniej częstotliwości w widmie obwiedni
-max_positive_freq_index = np.argmax(fft_envelope[positive_freq_indices])
-max_positive_freq = frequencies[positive_freq_indices][max_positive_freq_index]
 
-# Określenie parametrów m(t) na podstawie maksymalnej częstotliwości
-A1 = np.max(envelope)  # Amplituda stałej składowej
-A2 = np.max(envelope) / 2  # Amplituda składowej o częstotliwości max_positive_freq / 2
-A3 = np.max(envelope) / 2  # Amplituda składowej o częstotliwości max_positive_freq / 3
-f1 = max_positive_freq / 2  # Częstotliwość składowej o częstotliwości max_positive_freq / 2
-f2 = max_positive_freq / 3  # Częstotliwość składowej o częstotliwości max_positive_freq / 3
-f3 = max_positive_freq / 4  # Częstotliwość składowej o częstotliwości max_positive_freq / 4
+# Wyświetlenie porównania sygnałów
+plt.figure()
+plt.plot(envelope, 'c', linewidth=2)  # Zmiana grubości linii na 1.5
+plt.plot(x_reconstructed, 'k', linewidth=1)  # Zmiana grubości linii na 1.5
+plt.title('Porównanie sygnałów')
+plt.legend(['FIR - hilbert', 'odtworzone suma cos'])
 
-# Wyświetlenie wyników
-print("A1:", A1)
-print("A2:", A2)
-print("A3:", A3)
-print("f1:", f1)
-print("f2:", f2)
-print("f3:", f3)
+# Sygnał z pliku zmodulowany vs. sygnał skonstruowany zmodulowany
+x_modulated = np.sin(2 * np.pi * carrier_frequency * t)
+x_modulated = x_modulated[filter_lenght: -filter_lenght]
+y_reconstructed = x_modulated * x_reconstructed
 
-# Wyświetlenie sygnału oraz jego obwiedni
-plt.figure(figsize=(10, 6))
-plt.plot(t, x, label='Sygnał x')
-plt.plot(t, envelope, 'ro', label='Obwiednia')
-plt.title('Obwiednia sygnału x')
-plt.xlabel('Czas [s]')
-plt.ylabel('Amplituda')
-plt.legend()
-plt.grid(True)
-plt.show()
-
-# Wykres widma częstotliwościowego obwiedni
-plt.figure(figsize=(10, 6))
-plt.plot(frequencies[:N // 2], fft_envelope[:N // 2])
-plt.title('Widmo częstotliwościowe obwiedni')
-plt.xlabel('Częstotliwość [Hz]')
-plt.ylabel('Amplituda')
-plt.grid(True)
+plt.figure()
+plt.plot(y, 'b', linewidth=5)  # Zmiana grubości linii na 1.5
+plt.plot(y_reconstructed, 'r', linewidth=2)  # Zmiana grubości linii na 1.5
+plt.legend(['Sygnał skonstruowany i zmod.', 'Sygnał zmod. z pliku'])
 plt.show()

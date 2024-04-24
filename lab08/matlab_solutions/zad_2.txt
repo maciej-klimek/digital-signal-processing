@@ -1,0 +1,15 @@
+To ćwiczenie dotyczy modulacji amplitudy (AM) wykorzystującej różne techniki: DSB-C (Double Side Band with Carrier), DSB-SC (Double Side Band Suppressed Carrier) oraz SSB-SC (Single Side Band Suppressed Carrier). W przypadku modulacji AM, sygnał modulujący (częstość mówienia) jest mnożony przez nośny sygnał sinusoidalny, tworząc sygnał modulowany. W tym przypadku, generujemy trzy rodzaje sygnałów AM dla dwóch stacji radiowych. Każda stacja będzie modulowana inaczej: jedna za pomocą DSB-C, druga za pomocą DSB-SC, a trzecia za pomocą SSB-SC (z wstęgą boczną po lewej stronie nośnej).
+
+    DSB-C (Double Side Band with Carrier):
+        W tej modulacji, sygnał modulujący (mowa) jest dodawany do nośnej fazy sinusoidalnej.
+        Pierwsza stacja jest modulowana z użyciem DSB-C.
+
+    DSB-SC (Double Side Band Suppressed Carrier):
+        W tej modulacji, sygnał modulujący jest mnożony przez nośną fazy sinusoidalną, ale nosna jest usuwana.
+        Druga stacja jest modulowana z użyciem DSB-SC.
+
+    SSB-SC (Single Side Band Suppressed Carrier):
+        W tej modulacji, sygnał modulujący jest przesuwany w fazie o 90 stopni za pomocą transformacji Hilberta, a następnie jeden z wynikowych sygnałów (tzw. "wstęga boczna") jest mnożony przez sinus nośnej, a drugi przez cosinus nośnej.
+        Trzecia stacja jest modulowana z użyciem SSB-SC, jedna z wersji ma wstęgę boczną po lewej stronie nośnej, a druga po prawej stronie nośnej.
+
+Ostatecznie, modulowane sygnały są przetwarzane za pomocą transformaty Fouriera (FFT), aby zobaczyć ich widma.
