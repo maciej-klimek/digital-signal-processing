@@ -25,7 +25,7 @@ for snr_db in snr_levels:
     noisy_signals.append(d_noisy)  # dodanie zaszumionego sygnału do tablicy
 
 # Parametry filtru adaptacyjnego
-M = 1  # długość filtru
+M = 7  # długość filtru
 mi = 0.1  # współczynnik szybkości adaptacji
 
 # Czas trwania wykresu (w sekundach)
