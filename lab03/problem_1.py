@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-N = 100  # liczba próbek, zmienic na 1000 zeby pokazac
+N = 1000  # liczba próbek, zmienic na 1000 zeby pokazac
 fs = 1000  # częstotliwość próbkowania [Hz]
 
 f1 = 100  # częstotliwość pierwszej składowej [Hz]
@@ -20,11 +20,12 @@ x = A1 * np.cos(2 * np.pi * f1 * t + phi1) + A2 * np.cos(2 * np.pi * f2 * t + ph
 def get_DFT(size):
     k = np.arange(size)
     n = np.arange(size)
-    W_N = np.exp(1j * 2 * np.pi / size)  # W_N = e^(-j*2*pi/N)
-    result = (1 / np.sqrt(size)) * np.power(W_N, np.outer(-k, n))
+    w_n = np.exp(1j * 2 * np.pi / size)  # W_N = e^(j*2*pi/N)
+    result = (1 / np.sqrt(size)) * np.power(w_n, np.outer(-k, n))       # outer - iloczyn zewnętrzny
     return result
 
 A = get_DFT(N)
+print(A)
 X = np.dot(A, x)
 print(X)
 
@@ -134,14 +135,15 @@ x = A1 * np.cos(2 * np.pi * f1 * t + phi1) + A2 * np.cos(2 * np.pi * f2 * t + ph
 X = np.fft.fft(x)
 
 # Wyświetlenie widma
-freq = np.arange(N)* fs/N  # osie częstotliwości
-plt.figure(figsize=(10, 4))
-plt.plot(freq, np.abs(X))
-plt.xlabel('Częstotliwość [Hz]')
-plt.ylabel('Moduł')
-plt.title('Moduł widma dla zmienionej częstotliwości f1=125 Hz')
-plt.grid(True)
-plt.show()
+
+# freq = np.arange(N)* fs/N  # osie częstotliwości
+# plt.figure(figsize=(10, 4))
+# plt.plot(freq, np.abs(X))
+# plt.xlabel('Częstotliwość [Hz]')
+# plt.ylabel('Moduł')
+# plt.title('Moduł widma dla zmienionej częstotliwości f1=125 Hz')
+# plt.grid(True)
+# plt.show()
 
 # Idea DFT, dlaczego jest fajne itp
 # Dowiedz sie dlaczego jak fasz f1 = 125 to transformata sie rozmywa

@@ -11,22 +11,18 @@ freq_64 = 1000 * 64
 freq_112 = 1000 * 112
 freq_128 = 1000 * 128
 
-# Butterworth filter
 b_butter, a_butter = butter(7, 2 * np.pi * freq_64, analog=True)
 frequnecy_response_butter = freqs(b_butter, a_butter, w)[1]
 poles_butter = tf2zpk(b_butter, a_butter)[1]
 
-# Chebyshev Type I filter
 b_cheby1, a_cheby1 = cheby1(5, 3, 2 * np.pi * freq_64, analog=True)
 frequnecy_response_cheby1 = freqs(b_cheby1, a_cheby1, w)[1]
 poles_cheby1 = tf2zpk(b_cheby1, a_cheby1)[1]
 
-# Chebyshev Type II filter
 b_cheby2, a_cheby2 = cheby2(5, 40, 2 * np.pi * freq_112, analog=True)
 frequnecy_response_cheby2 = freqs(b_cheby2, a_cheby2, w)[1]
 poles_cheby2 = tf2zpk(b_cheby2, a_cheby2)[1]
 
-# Elliptic filter
 b_ellip, a_ellip = ellip(3, 3, 40, 2 * np.pi * freq_64, analog=True)
 frequnecy_response_ellip = freqs(b_ellip, a_ellip, w)[1]
 poles_ellip = tf2zpk(b_ellip, a_ellip)[1]
@@ -42,6 +38,8 @@ plt.title("Odpowiedź częstotliwościowa modelów")
 plt.xlabel("Częstotliwość (kHz)")
 plt.ylabel("Odpowiedź (dB)")
 plt.legend(["Butter", "Czeby1", "Czeby2", "Elipt"])
+plt.axhline(y=-40, color='r', linestyle='--')
+
 
 plt.figure()
 plt.plot(np.real(poles_butter), np.imag(poles_butter), '*')

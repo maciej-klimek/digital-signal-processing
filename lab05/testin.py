@@ -1,68 +1,45 @@
 import numpy as np
-from scipy.signal import freqs, impulse, TransferFunction, step
+from scipy.signal import ellip, zpk2tf, freqs
 import matplotlib.pyplot as plt
 
-N_values = [2, 4, 6, 8]
-omega_3dB = 2 * np.pi * 100
-w = np.linspace(0, 2000, num=20001) * 2 * np.pi  # Angular frequency in rad/s
-ang = np.zeros((4, len(w)))
-Hdec = np.zeros((4, len(w)))
-Hlin = np.zeros((4, len(w)))
+# Ustawienia początkowe
+num_points = 4096
+max_filter_order = 4
+center_frequency_norm = 96  # MHz
+center_frequency = 2 * np.pi * 1000000 * center_frequency_norm  # radiany
+tolerance_1MHz_norm = 1  # MHz
+tolerance_1MHz = 2 * np.pi * 1000000 * tolerance_1MHz_norm  # radiany
 
-for i, N in enumerate(N_values):
-    angles = np.pi/2 + (1/2) * np.pi/N + (np.arange(1, N+1)-1)*np.pi/N
-    poles = omega_3dB * np.exp(1j * angles)
-    wzm = np.prod(-poles)
-    a = np.poly(poles)
-    b = [wzm]
-    w, h = freqs(b, a, worN=w)
+frequencies_1MHz = np.linspace(center_frequency - 2 * tolerance_1MHz,
+                                center_frequency + 2 * tolerance_1MHz, num_points)
 
-    ang[i, :] = np.angle(h)
-    Hdec[i, :] = 20 * np.log10(np.abs(h))
-    Hlin[i, :] = np.abs(h)
+# Projektowanie testowego filtru (96 MHz ±1 MHz)
+ze_1MHz, pe_1MHz, ke_1MHz = ellip(max_filter_order, 3, 40, [
+                                   center_frequency - tolerance_1MHz, center_frequency + tolerance_1MHz], btype='bandpass', analog=True, output='zpk')
+be_1MHz, ae_1MHz = zpk2tf(ze_1MHz, pe_1MHz, ke_1MHz)
+frequency_response_1MHz = freqs(be_1MHz, ae_1MHz, frequencies_1MHz)
 
-# Logarithmic scale plot
-plt.figure()
-for row in range(4):
-    plt.semilogx(w / (2 * np.pi), Hdec[row, :], label=f"{N_values[row]}")
+# Obliczanie fazy odpowiedzi częstotliwościowej
+phase_response_1MHz = np.angle(frequency_response_1MHz[1], deg=True)  # Faza w stopniach
+
+# Wykres charakterystyki częstotliwościowej testowego filtru (96 MHz ±1 MHz)
+plt.figure(figsize=(10, 6))
+
+# Wykres amplitudy
+plt.subplot(2, 1, 1)
+plt.plot(frequencies_1MHz / (2 * np.pi * 1e6), 20 * np.log10(np.abs(frequency_response_1MHz[1])))
 plt.grid(True)
-plt.legend()
-plt.title("Charakterystyka A-cz skala logarytmiczna")
+plt.title("Charakterystyka częstotliwościowa testowego filtru (±1 MHz)")
+plt.xlabel("Częstotliwość (MHz)")
+plt.ylabel("Amplituda (dB)")
 
-# Linear scale plot
-plt.figure()
-for row in range(4):
-    plt.plot(w / (2 * np.pi), Hlin[row, :], label=f"{N_values[row]}")
-plt.legend()
-plt.title("Charakterystyka A-cz skala liniowa")
+# Wykres fazy
+plt.subplot(2, 1, 2)
+plt.plot(frequencies_1MHz / (2 * np.pi * 1e6), np.unwrap(phase_response_1MHz))
+plt.grid(True)
+plt.title("Charakterystyka fazowa testowego filtru (±1 MHz)")
+plt.xlabel("Częstotliwość (MHz)")
+plt.ylabel("Faza (stopnie)")
 
-# Phase plot
-plt.figure()
-for row in range(4):
-    plt.plot(w / (2 * np.pi), ang[row, :], label=f"{N_values[row]}")
-plt.legend()
-plt.title("Charakterystyka cz-f")
-
-# Impulse and step response for N=4
-N = 4
-omega_3dB = 2 * np.pi * 100  # Example cutoff frequency
-poles4 = omega_3dB * \
-    np.exp(1j * (np.pi/2 + 1/2 * np.pi/N + (np.arange(1, N+1)-1)*np.pi/N))
-
-a = np.poly(poles4)
-b = [np.prod(-poles4)]
-H = TransferFunction(b, a)
-
-# Impulse response
-tOut, y = impulse(H)
-plt.figure()
-plt.plot(tOut, y)
-plt.title("Odpowiedź impulsowa")
-
-# Step response
-tOut, y = step(H)
-plt.figure()
-plt.plot(tOut, y)
-plt.title("Odpowiedź na skok jednostkowy")
-
+plt.tight_layout()
 plt.show()
