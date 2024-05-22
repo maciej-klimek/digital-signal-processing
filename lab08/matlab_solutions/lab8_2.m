@@ -4,23 +4,23 @@ clear all; close all;
 
 
 %% Generowanie teoretycznej odpowiedzi impulsowej
-freq_sampling = 400e3;                         % czestotliwosc probkowania
-fc = 100e3;                         % czestotliwosc nosna
-M  = 1024;                            % polowa dlugosci filtra odpowiednia szerokość pasma
+freq_sampling = 400e3;                          % czestotliwosc probkowania
+fc = 100e3;                                     % czestotliwosc nosna
+M  = 1024;                                      % polowa dlugosci filtra odpowiednia szerokość pasma
 N  = 2*M+1;
 n  = 1:M;
-h_windowed  = (2/pi)*sin(pi*n/2).^2 ./n;     % połowa odpowiedzi impulsowej (TZ str. 352)
-h_windowed  = [-h_windowed(M:-1:1) 0 h_windowed(1:M)];         % cała odpowiedź dla n = ?M,...,0,...,M
+h_windowed  = (2/pi)*sin(pi*n/2).^2 ./n;                        % połowa odpowiedzi impulsowej (TZ str. 352)
+h_windowed  = [-h_windowed(M:-1:1) 0 h_windowed(1:M)];          % cała odpowiedź dla n = ?M,...,0,...,M
 
 %% Wymnażanie przez okno Blackmana
 blackman_window  = blackman(N); 
 blackman_window  = blackman_window';            
-h_windowed = h_windowed.*blackman_window;                          % wymnożenie odpowiedzi impulsowej z oknem
+h_windowed = h_windowed.*blackman_window;  % wymnożenie odpowiedzi impulsowej z oknem
 
 %% Zaladowanie sygnalow modulowanych
 [x1,fs1] = audioread('mowa8000.wav');
 x1 = x1';
-x2 = fliplr(x1);                    % druga stacja to mowa8000 od tyłu
+x2 = fliplr(x1);     % druga stacja to mowa8000 od tyłu
 
 %% Parametry sygnalow radiowych
 freq_sampling  = 400e3;                        % czestotliwosc probkowania sygnalu radiowego
@@ -41,12 +41,6 @@ x_windowed_2 = x_windowed_2(M+1:length(x_resampled_2)+M);
 t1 = length(x1)/fs1;
 t  = 0:1/freq_sampling:t1-1/freq_sampling;
 
-%% Filtrowanie filterm Hilberta
-% xh1 = hilbert(xr1); 
-% xh1 = imag(xh1);
-% 
-% xh2 = hilbert(xr2); 
-% xh2 = imag(xh2);
 
 %% Generowanie sygnalow radiowych
 %DSB-C

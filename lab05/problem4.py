@@ -2,30 +2,31 @@ import numpy as np
 from scipy.signal import ellip, zpk2tf, freqs
 import matplotlib.pyplot as plt
 
+# Ustawienia początkowe
 num_points = 4096
 max_filter_order = 4
 center_frequency_norm = 96  # MHz
 center_frequency = 2 * np.pi * 1000000 * center_frequency_norm  # radiany
-tolerance_norm = 50  # kHz
-tolerance = 2 * np.pi * 1000 * tolerance_norm  # radiany
+tolerance_1MHz_norm = 1  # MHz
+tolerance_1MHz = 2 * np.pi * 1000000 * tolerance_1MHz_norm  # radiany
 
-frequencies = np.linspace(center_frequency - 2 * tolerance,
-                          center_frequency + 2 * tolerance, num_points)
+frequencies_1MHz = np.linspace(center_frequency - 2 * tolerance_1MHz,
+                                center_frequency + 2 * tolerance_1MHz, num_points)
 
-ze, pe, ke = ellip(max_filter_order, 3, 40, [
-                   center_frequency - tolerance, center_frequency + tolerance], btype='bandpass', analog=True, output='zpk')
+# Projektowanie testowego filtru (96 MHz ±1 MHz)
+ze_1MHz, pe_1MHz, ke_1MHz = ellip(max_filter_order, 3, 40, [
+                                   center_frequency - tolerance_1MHz, center_frequency + tolerance_1MHz], btype='bandpass', analog=True, output='zpk')
+be_1MHz, ae_1MHz = zpk2tf(ze_1MHz, pe_1MHz, ke_1MHz)
+frequency_response_1MHz = freqs(be_1MHz, ae_1MHz, frequencies_1MHz)
 
-# Konwersja zpk na współczynniki transmitancji (mianownik, licznik)
-be, ae = zpk2tf(ze, pe, ke)
 
-frequency_response = freqs(be, ae, frequencies)
-
-plt.plot(frequencies / (2 * np.pi * 1e6), 20 *
-         np.log10(np.abs(frequency_response[1])))
-plt.axis([center_frequency_norm - 2 * tolerance_norm / 1e3,
-         center_frequency_norm + 2 * tolerance_norm / 1e3, -45, 5])
+# Wykres charakterystyki częstotliwościowej testowego filtru (96 MHz ±1 MHz)
+plt.figure(figsize=(10, 6))
+plt.plot(frequencies_1MHz / (2 * np.pi * 1e6), 20 *
+         np.log10(np.abs(frequency_response_1MHz[1])))
 plt.grid(True)
-plt.title("Frequency Response Characteristic of Bandpass Filter")
-plt.xlabel("Frequency (MHz)")
-plt.ylabel("Response (dB)")
+plt.title("Charakterystyka częstotliwościowa testowego filtru (±1 MHz)")
+plt.xlabel("Częstotliwość (MHz)")
+plt.ylabel("Odpowiedź (dB)")
 plt.show()
+

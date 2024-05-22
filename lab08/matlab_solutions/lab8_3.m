@@ -58,11 +58,11 @@ subplot(3,1,3);
 plot(abs(fft(x4_upsampling)),'b');
 title('Widmo - sygnal upsampling');
 
-%{
-sound(x4, fs3);
-pause(2);
-sound(x4_upsampling, fs3);
-%}
+
+% sound(x4, fs3);
+% pause(2);
+% sound(x4_upsampling, fs3);
+
 
 %% Porownanie analityczny vs resampled
 figure(3);
@@ -113,8 +113,4 @@ miks = x1wav_interp; %sygna³ 1
 miks(1:length(x2wav_interp)) = miks(1:length(x2wav_interp)) + x2wav_interp; %sygna³ 2 dodany do 1
 
 sound(miks(1:length(x1wav_interp)), f_wav);
-
-
-
-
 

@@ -50,6 +50,16 @@ plt.title("Charakterystyka Fazowa")
 plt.xlabel("Częstotliwość [Hz]")
 plt.ylabel("Kąt [rad]")
 
+plt.figure()
+plt.grid(True)
+for row in range(4):
+    plt.plot(w_out / (2 * np.pi), np.unwrap(ang[row, :]))
+plt.legend(N_values)
+plt.title("Charakterystyka Fazowa [unwraped]")
+plt.xlabel("Częstotliwość [Hz]")
+plt.ylabel("Kąt [rad]")
+
+
 
 plt.figure()
 plt.grid(True)

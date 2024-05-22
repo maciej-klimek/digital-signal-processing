@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 p_12 = -0.5 + 9.5j
 p_34 = -1 + 10j
@@ -22,9 +23,8 @@ plt.axis('equal')
 plt.xlabel("Re(z)")
 plt.ylabel("Im(z)")
 
-plt.show()
-
 amp = 0.42
+# amp = 1
 
 a_poly = np.poly(p_array)
 b_poly = np.poly(z_array) * amp
@@ -46,11 +46,19 @@ plt.xlabel("Frequency [rad/s]")
 plt.ylabel("20log10(|H(jw)|)")
 
 plt.figure()
-H_phase = np.angle(np.polyval(b_poly, s) / np.polyval(a_poly, s))
+H_phase = np.unwrap(np.angle(np.polyval(b_poly, s) / np.polyval(a_poly, s)))
 plt.plot(w, H_phase, 'g')
 plt.xlabel('Frequency [rad/s]')
 plt.ylabel('Phase [rad]')
 plt.title('Frequency Response Phase')
 plt.grid(True)
 
+# 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot(w, H_lin, H_phase, color='b')
+ax.set_xlabel('Frequency [rad/s]')
+ax.set_ylabel('|H(jw)|')
+ax.set_zlabel('Phase [rad]')
+ax.set_title('3D Frequency Response')
 plt.show()
