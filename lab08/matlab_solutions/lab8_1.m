@@ -1,4 +1,4 @@
-clear;
+    clear;
 close all;
 
 %% za³adowanie sygna³ów

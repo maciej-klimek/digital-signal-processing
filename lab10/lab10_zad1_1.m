@@ -13,7 +13,7 @@ plot(x); title('sygnał mowy'); % pokaż go oraz odtwórz na głośnikach (słuc
 N=length(x); % długość sygnału
 Mlen=240; % długość okna Hamminga (liczba próbek)
 Mstep=180; % przesunięcie okna w czasie (liczba próbek)
-Np=8; % rząd filtra predykcji
+Np=4; % rząd filtra predykcji !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 gdzie=Mstep+1; % początkowe położenie pobudzenia dźwięcznego
 
 lpc=[]; % tablica na współczynniki modelu sygnału mowy

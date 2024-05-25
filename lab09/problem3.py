@@ -74,44 +74,30 @@ print("MSE dla sygnału pilota z dodatkowymi zmianami częstotliwości:", mse_va
 
 # Wykresy
 t_start = 0.2
-t_end = 0.25
+t_end = 0.3
 
-# Punkt 1: Wykresy sygnału pilota o stałym przesunięciu fazowym
+# Wykres sygnału pilota i sygnału nosnej dla stałego przesunięcia fazowego
 plt.figure()
-plt.plot(t_constant, pilot_signal_constant)
-plt.title('Sygnał pilota (stałe przesunięcie fazowe)')
+plt.plot(t_constant, pilot_signal_constant, label='Sygnał pilota')
+plt.plot(t_constant, c57_constant, label='Sygnał nosnej 57 kHz')
+plt.title('Sygnał pilota i nosnej (stałe przesunięcie fazowe)')
 plt.xlabel('Czas [s]')
 plt.ylabel('Amplituda')
-plt.xlim(t_start, t_end)
+plt.legend()
 plt.grid(True)
+plt.xlim(t_start, t_end)
 plt.show()
 
+# Wykres sygnału pilota i sygnału nosnej dla zmiennej częstotliwości pilota
 plt.figure()
-plt.plot(t_constant, c57_constant)
-plt.title('Sygnał nosnej 57 kHz')
+plt.plot(t_variable, pilot_signal_variable, label='Sygnał pilota')
+plt.plot(t_variable, c57_variable, label='Sygnał nosnej 57 kHz')
+plt.title('Sygnał pilota i nosnej (zmienne częstotliwości)')
 plt.xlabel('Czas [s]')
 plt.ylabel('Amplituda')
-plt.xlim(t_start, t_end)
+plt.legend()
 plt.grid(True)
-plt.show()
-
-# Punkt 2: Wykresy sygnału pilota z dodatkowymi zmianami częstotliwości
-plt.figure()
-plt.plot(t_variable, pilot_signal_variable)
-plt.title('Sygnał pilota (zmienne częstotliwości)')
-plt.xlabel('Czas [s]')
-plt.ylabel('Amplituda')
 plt.xlim(t_start, t_end)
-plt.grid(True)
-plt.show()
-
-plt.figure()
-plt.plot(t_variable, c57_variable)
-plt.title('Sygnał nosnej 57 kHz')
-plt.xlabel('Czas [s]')
-plt.ylabel('Amplituda')
-plt.xlim(t_start, t_end)
-plt.grid(True)
 plt.show()
 
 # Punkt 3: Wykres szybkości zbieżności pętli PLL

@@ -1,3 +1,8 @@
+% ----------------------------------------------------------
+% Tabela 19-4 (str. 567)
+% Ćwiczenie: Kompresja sygnału mowy według standardu LPC-10
+% ----------------------------------------------------------
+
 clear;
 close all;
 
@@ -6,10 +11,30 @@ oryginalny = x;
 bezdzw = 80700:81400; % głoska bezdźwięczna (Przy!ci!sku...)
 dzw = 3000:3700; % głoska dźwięczna (!M!aterial kursu...)
 
-% Preemfaza - filtracja wstępna
-x = filter([1 -0.9735], 1, x);
+% Wyświetl sygnał i wybrane głoski
+figure(1);
+subplot(3,1,1);
+plot((1:length(x))/fpr, x); title('Sygnał mowy');
 
-% Parametry
+subplot(3,1,2);
+plot(dzw/fpr, x(dzw)); title('Głoska dźwięczna');
+
+subplot(3,1,3);
+plot(bezdzw/fpr, x(bezdzw)); title('Głoska bezdźwięczna');
+
+% Widma gęstości mocy
+figure(2);
+subplot(2,1,1);
+hpsdd1 = dspdata.psd(abs(x(dzw)), 'Fs', fpr);
+plot(hpsdd1); title('Widmo gęstości mocy - głoska dźwięczna przed preemfazą');
+
+subplot(2,1,2);
+hpsdb1 = dspdata.psd(abs(x(bezdzw)), 'Fs', fpr);
+plot(hpsdb1); title('Widmo gęstości mocy - głoska bezdźwięczna przed preemfazą');
+
+% soundsc(x,fpr);  % oraz odtwórz na głośnikach (słuchawkach)
+
+% Okno Hamminga
 N = length(x);  % długość sygnału
 Mlen = 240;  % długość okna Hamminga (liczba próbek)
 Mstep = 180;  % przesunięcie okna w czasie (liczba próbek)
@@ -22,10 +47,35 @@ ss = [];  % fragment sygnału mowy zsyntezowany
 bs = zeros(1, Np);  % bufor na fragment sygnału mowy
 Nramek = floor((N - Mlen) / Mstep + 1);  % ile fragmentów (ramek) jest do przetworzenia
 
-% Dekoder z różnymi wariantami pobudzenia
+% Preemfaza - filtracja wstępna
+x = filter([1 -0.9735], 1, x);
+
+% Podpunkt a
+figure(3);
+subplot(3,1,1);
+plot((1:length(x))/fpr, x); title('Sygnał mowy po preemfazie');
+
+subplot(3,1,2);
+plot(dzw, oryginalny(dzw), dzw, x(dzw)); title('Głoska dźwięczna przed i po preemfazie');
+legend('przed', 'po');
+
+subplot(3,1,3);
+plot(bezdzw, oryginalny(bezdzw), bezdzw, x(bezdzw)); title('Głoska bezdźwięczna przed i po preemfazie');
+legend('przed', 'po');
+
+figure(4);
+hpsdd2 = dspdata.psd(abs(x(dzw)), 'Fs', fpr);
+hpsdb2 = dspdata.psd(abs(x(bezdzw)), 'Fs', fpr);
+
+subplot(2,1,1);
+plot(hpsdd2); title('Widmo gęstości mocy - głoska dźwięczna po preemfazie');
+
+subplot(2,1,2);
+plot(hpsdb2); title('Widmo gęstości mocy - głoska bezdźwięczna po preemfazie');
+
 for nr = 1:Nramek
 
-    % Pobierz kolejny fragment sygnału
+    % pobierz kolejny fragment sygnału
     n = 1 + (nr - 1) * Mstep : Mlen + (nr - 1) * Mstep;
     bx = x(n);
 
@@ -41,7 +91,7 @@ for nr = 1:Nramek
         end
     end
 
-    % Analiza - wyznacz parametry modelu
+    % ANALIZA - wyznacz parametry modelu ---------------------------------------------------
     bx = bx - mean(bx);  % usuń wartość średnią
     for k = 0:Mlen-1
         r(k+1) = sum(bx(1:Mlen-k) .* bx(1+k:Mlen)); % funkcja autokorelacji
@@ -62,28 +112,10 @@ for nr = 1:Nramek
     end
     a = -inv(R) * rr;  % oblicz współczynniki filtra predykcji
     wzm = r(1) + r(2:Np+1) * a;  % oblicz wzmocnienie
-    H = freqz(1, [1; a]);  % oblicz jego odp. częstotliwościową
+    H = freqz(1, [1; a]);  % oblicz jego odpowiedź częstotliwościową
 
-    % Warianty dekodowania
-    variant = 4; % Zmień wartość na 1, 2, 3, lub 4 aby wybrać odpowiedni wariant
-
-    switch variant
-        case 1
-            T = 0;  % Zawsze bezdźwięczne
-        case 2
-            if T ~= 0
-                T = 2 * T;  % Obniż dwukrotnie częstotliwość tonu podstawowego
-            end
-        case 3
-            if T ~= 0
-                T = 80;  % Ustaw stałą wartość tonu podstawowego
-            end
-        case 4
-            T = 0;  % Użyj próbek z pliku coldvox.wav
-            [coldvox, ~] = audioread('coldvox.wav');
-    end
-
-    % SYNTEZA - odtwórz na podstawie parametrów
+    % SYNTEZA - odtwórz na podstawie parametrów ----------------------------------------------------------------------
+    % T = 0; % usuń pierwszy znak '%' i ustaw: T = 80, 50, 30, 0 (w celach testowych)
     aa = quantize_coefficients(a);
 
     if (T ~= 0) 
@@ -92,11 +124,7 @@ for nr = 1:Nramek
     for n = 1:Mstep
         % T = 70; % 0 lub > 25 - w celach testowych
         if (T == 0)
-            if variant == 4
-                pob = coldvox(mod(n-1, length(coldvox)) + 1);  % Pobudzenie z coldvox.wav
-            else
-                pob = 2 * (rand(1, 1) - 0.5);  % Pobudzenie szumowe
-            end
+            pob = 2 * (rand(1, 1) - 0.5); 
             gdzie = (3/2) * Mstep + 1;  % pobudzenie szumowe
         else
             if (n == gdzie) 
@@ -115,50 +143,8 @@ end
 
 s = filter(1, [1 -0.9735], s);  % filtracja (deemfaza) - filtr odwrotny - opcjonalny
 
-plot(s); title('mowa zsyntezowana');  %pause
+plot(s); title('Mowa zsyntezowana');  %pause
 soundsc(s, fpr)
-
-% Obliczanie sygnału resztkowego
-
-% Zakładając, że 'oryginalny' zawiera nagranie oryginalnego sygnału mowy,
-% gdzie zawiera nagranie oryginalnego sygnału mowy
-% Zakładamy, że 'oryginalny' zawiera nagranie oryginalnego sygnału mowy,
-% 'fpr' jest częstotliwością próbkowania
-
-% Wybierz dźwięczny fragment mowy o stałej amplitudzie i częstotliwości tonu podstawowego
-dzw_amplituda = mean(abs(oryginalny(dzw)));
-dzw_czestotliwosc = 200; % Załóżmy, że częstotliwość tonu podstawowego to 200 Hz
-
-% Wygeneruj sygnał o zadanej amplitudzie i częstotliwości
-t = (0:length(dzw)-1) / fpr; % Czas trwania sygnału w sekundach
-sygnal_dzw = dzw_amplituda;
-%sygnal_dzw = dzw_amplituda * sin(2*pi*dzw_czestotliwosc*t)/10;
-
-
-
-% Obliczanie transmitancji H(z)
-A = [1 0.2 -0.6]; % Przykładowe współczynniki transmitancji
-B = [1 -0.5 0.7]; % Przykładowe współczynniki transmitancji
-H_z = freqz(B, A, length(sygnal_dzw));
-
-% Przefiltrowanie transmitancji odwrotnym filtrem
-H_z_odwrotny = freqz(A, B, length(sygnal_dzw));
-sygnal_resztkowy = filter(B, A, sygnal_dzw);
-
-% Wyświetlenie sygnału resztkowego
-figure;
-subplot(2,1,1);
-plot(sygnal_dzw);
-title('Sygnał dźwięczny');
-xlabel('Próbki');
-ylabel('Amplituda');
-subplot(2,1,2);
-plot(sygnal_resztkowy);
-title('Sygnał resztkowy');
-xlabel('Próbki');
-ylabel('Amplituda');
-
-
 
 function q = quantize_coefficients(a)
     % Quantize the coefficients using scaling and rounding

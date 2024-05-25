@@ -9,13 +9,13 @@ fc = 100e3;                                     % czestotliwosc nosna
 M  = 1024;                                      % polowa dlugosci filtra odpowiednia szerokość pasma
 N  = 2*M+1;
 n  = 1:M;
-h_windowed  = (2/pi)*sin(pi*n/2).^2 ./n;                        % połowa odpowiedzi impulsowej (TZ str. 352)
-h_windowed  = [-h_windowed(M:-1:1) 0 h_windowed(1:M)];          % cała odpowiedź dla n = ?M,...,0,...,M
+h  = (2/pi)*sin(pi*n/2).^2 ./n;                        % połowa odpowiedzi impulsowej (TZ str. 352)
+h  = [-h(M:-1:1) 0 h(1:M)];          % cała odpowiedź dla n = ?M,...,0,...,M
 
 %% Wymnażanie przez okno Blackmana
 blackman_window  = blackman(N); 
 blackman_window  = blackman_window';            
-h_windowed = h_windowed.*blackman_window;  % wymnożenie odpowiedzi impulsowej z oknem
+h = h.*blackman_window;  % wymnożenie odpowiedzi impulsowej z oknem
 
 %% Zaladowanie sygnalow modulowanych
 [x1,fs1] = audioread('mowa8000.wav');
@@ -32,8 +32,8 @@ modulation_depth  = 0.25;                         % glebokosc modulacji obu stac
 x_resampled_1 = resample(x1, freq_sampling, fs1);
 x_resampled_2 = resample(x2, freq_sampling, fs1);        %fs/fsx
 
-x_windowed_1 = conv(x_resampled_1,h_windowed);
-x_windowed_2 = conv(x_resampled_2,h_windowed);
+x_windowed_1 = conv(x_resampled_1,h);
+x_windowed_2 = conv(x_resampled_2,h);
 
 x_windowed_1 = x_windowed_1(M+1:length(x_resampled_1)+M);
 x_windowed_2 = x_windowed_2(M+1:length(x_resampled_2)+M);

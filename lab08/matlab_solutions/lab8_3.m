@@ -70,7 +70,7 @@ figure(3);
 subplot(3,1,1);
 hold all;
 plot(x4, 'r');
-plot(x4_resampling, 'b');
+plot(x4_resampling, 'b*');
 legend('analityczny','resampling');
 title('Sygnal analityczny i resampling');
 
@@ -112,5 +112,5 @@ miks = x1wav_interp; %sygna³ 1
 
 miks(1:length(x2wav_interp)) = miks(1:length(x2wav_interp)) + x2wav_interp; %sygna³ 2 dodany do 1
 
-sound(miks(1:length(x1wav_interp)), f_wav);
+% sound(miks(1:length(x1wav_interp)), f_wav);
 
