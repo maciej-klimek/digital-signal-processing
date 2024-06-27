@@ -19,6 +19,8 @@
   y = [ 1 1; 1 -1] * [ y(1:2:N); ...
                        y(2:2:N) ]; y = y(:)';   % 2-punktowe widma DFT
 
+  y,
+
 % Rekonstrukcja N-punktowego DFT z 2-punktowych
 % Widma DFT: 2-punktowe --> 4-punktowe --> 8-punktowe --> 16-punktowe ...
   Nx = N;                   % liczba probek (zmiana nazwy zmiennej)

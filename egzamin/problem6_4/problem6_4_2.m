@@ -15,6 +15,7 @@ f_frag_long = fpr * (0:(fragment_length/2)) / fragment_length;
 
 figure;
 for i = 1:num_fragments
+
     fragment = x_noisy_long((i-1)*fragment_length + 1:i*fragment_length);
     X_frag = fft(fragment);
     P2_frag = abs(X_frag / fragment_length).^2;
@@ -22,7 +23,7 @@ for i = 1:num_fragments
     P1_frag(2:end-1) = 2*P1_frag(2:end-1);
     P_avg = P_avg + P1_frag;
 
-    % % Plotowanie fragmentu sygnału
+    % % Plotowanie kolejnych fragmentów wygnału
     % subplot(3, 1, 1);
     % plot(t_long((i-1)*fragment_length + 1:i*fragment_length), fragment, "r", LineWidth=1);
     % hold on;
@@ -46,10 +47,9 @@ for i = 1:num_fragments
     xlabel('f (Hz)'); ylabel('P(f) (V^2)');
     grid on;
 
-    % Obliczenie średniego widma mocy z uwzględnieniem wszystkich fragmentów do aktualnego
+    % Obliczenie średniego widma mocy
     P_avg_current = P_avg / i;
 
-    % Plotowanie średniego widma mocy
     subplot(3, 1, 3);
     plot(f_frag_long, P_avg_current, "m:.", LineWidth=3, Marker=".", MarkerSize=20, MarkerEdgeColor="k");
     title('Średnie widmo mocy ze wszystkich przetworzonych fragmentów');
@@ -64,7 +64,7 @@ end
 P_avg = P_avg / num_fragments;
 f_frag_long = fpr * (0:(fragment_length/2)) / fragment_length;
 
-% Wyświetlenie sygnału i średniego widma mocy
+% Plotowanie sygnału i średniego widma mocy
 figure;
 subplot(2, 1, 1);
 plot(t_long, x_noisy_long, "r");
