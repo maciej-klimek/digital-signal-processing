@@ -1,0 +1,8 @@
+Problem 4.4 (* DFT-IDFT #1: Ene due rabe, połkn ˛ał bocian ˙zab˛e). Zmodyfikuj program 3.2: dodaj do niego
+generacj˛e macierzy A oraz S=A’ ortogonalnej transformacji DFT, tak jak w problemie/zadaniu 4.1. Wybierz opcj˛e
+x=real(x1)+imag(x2). Nast˛epnie wyzeruj w widmie DFT współczynniki zwi ˛azane z sygnałem: 1) x1, albo 2)
+x2. Oblicz IDFT oraz na jednym rysunku wy´swietl sygnał x oraz otrzymany. Porównaj otrzymany sygnał z orygi-
+nałem, np. oryginalny i odzyskany z sumy sygnał real(x1).
+
+Główna idea: Usuwanie z widma wybranych współczynników
+

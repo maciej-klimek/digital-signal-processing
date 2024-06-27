@@ -1,0 +1,13 @@
+Polecenie:
+Problem 5.7 (*** Nierekurencyjna wersja algorytmu radix-2 DIT FFT w dowolnym j˛ezyku programowania).
+Przeanalizuj program z listingu 5.3. Znajd´z w nim podobie´nstwo do rekurencyjnej funkcji implementuj ˛acej algo-
+rytm radix-2 DIT FFT, przedstawionej w listingu 5.2. Uruchom program 5.3, sprawd´z poprawno´s´c otrzymywanych
+wyników - porównaj je z wynikami funkcji Matlaba X=fft(x). Napisz program implementuj ˛acy ten algorytm FFT
+w Twoim ulubionym j˛ezyku programowania: C, C++, Python, Java, ... Wynik działania Twojego programu powinien
+by´c identyczny jak programu 5.3 — dla dowolnej warto´sci N=2ˆp oraz dowolnego sygnału x. Zwró´c szczególn ˛a
+uwag˛e na sposób implementacji oblicze´n na liczbach zespolonych, maj ˛acych cz˛e´s´c rzeczywist ˛a i urojon ˛
+
+Główna idea: Szybsze obliczanie DFT
+
+1. Rodzielamy X na wspołczynniki parzyste i nieparzyste -> X
+2. Zamieniamy indeksy na ich binarną reprezentacje -> Odwracamy bity -> Na ich podstawie bierzemy kolejność
