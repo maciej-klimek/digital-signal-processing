@@ -48,7 +48,7 @@ for i = 1:num_fragments
     grid on;
 
     % Obliczenie średniego widma mocy
-    P_avg_current = P_avg / i;
+    P_avg_current = abs(P_avg - mean(P_avg)) / i;
 
     subplot(3, 1, 3);
     plot(f_frag_long, P_avg_current, "m:.", LineWidth=3, Marker=".", MarkerSize=20, MarkerEdgeColor="k");
@@ -61,7 +61,7 @@ for i = 1:num_fragments
 end
 
 % Ostateczne obliczenie średniego widma mocy
-P_avg = P_avg / num_fragments;
+P_avg = abs(P_avg - mean(P_avg)) / num_fragments;
 f_frag_long = fpr * (0:(fragment_length/2)) / fragment_length;
 
 % Plotowanie sygnału i średniego widma mocy

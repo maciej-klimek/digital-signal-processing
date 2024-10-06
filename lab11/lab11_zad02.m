@@ -18,13 +18,16 @@ hold all
 grid
 title("Okno analizy i syntezy")
 xlabel("Próbki"); ylabel("Amplituda");
+
 %% Macierz analizy Modified DCT
 A = zeros(N/2, N); 
 for k = 1:N/2 
     A(k, :) = sqrt(4/N)*cos(2*pi/N*(k-1+0.5)*(n+0.5+N/4));
 end
+
 %% Macierz syntezy (transponowanie macierzy analizy)
 S = A';
+
 %% Takie tam działania 
 %pozbywamy się częstotliwości mniej znaczących
 % Q - współczynnik skalujący
@@ -60,17 +63,27 @@ end
 y = y/Q;
 
 %% Błąd
-max(abs(x-y'))
-mean(abs(x-y'))
+error_signal = x - y';
+max_error = max(abs(error_signal));
+mean_error = mean(abs(error_signal));
+disp(['Max Error: ', num2str(max_error)])
+disp(['Mean Error: ', num2str(mean_error)])
+
 %% Wykresy
 n=1:length(x);
 
 figure;
 hold all;
-plot(n, x)
-plot(n, y);
+plot(n, x, 'k')  % sygnał oryginalny na czarno
+plot(n, y, 'g*'); % sygnał zrekonstruowany na zielono
 title('Sygnał oryginalny vs po odkodowaniu z MDCT');
 legend('Referencyjny', 'Zrekonstruowany')
+
+figure;
+plot(n, error_signal, 'r') % wykres błędu na czerwono
+title('Błąd między sygnałem oryginalnym a odtworzonym');
+xlabel('Próbki'); ylabel('Amplituda błędu');
+grid on;
 
 %% Słuchanie
 soundsc(y, fpr)

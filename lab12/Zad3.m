@@ -8,7 +8,7 @@ I = imread('car1.jpg');
 I1 =  double(rgb2gray(I));
 figure;
 imshow(I1,[]);
-title('I1 - bazowy')
+title('IM1 - bazowy')
 
 % filtracja wstępna:
 % generowanie maski filtru Gaussa
@@ -19,19 +19,19 @@ h = fspecial('gaussian', hsize, sigma);
 I2 = imfilter(I1, h);
 figure;
 imshow(I2,[]);
-title('I2 - po filtracji wstępnej');
+title('IM2 - po filtracji wstępnej');
 % kwantyzacja po filtracji [0 255]
 I2 = quant(I2,1);
 
 % -----  dobór progu ------
 imcontrast  
 
-lt =  94;      % dolny prog binaryzacji
-ut =  102;     % gorny prog binaryzacji
+lt =  83;      % dolny prog binaryzacji
+ut =  94;     % gorny prog binaryzacji
 
 % ----- binaryzacja -------
 B1 = I2; 
-B1(B1<lt)=0; % usunięcie pikseli o wartościach mniejszych od lt 
+B1(B1<lt)=0; % usunięcie pikseli o wartościach mniejszych od lt s
 B1(B1>ut)=0; % usunięcie pikseli o wartościach większych od ut 
 B1(B1>0) = 1; % przypisanie pozostałym o wartościom 1
 figure;
@@ -57,6 +57,7 @@ figure;
 imshow(Iprewitt,[]);
 title('Detekcja krawędzi filtrem Prewitta')
 
+figure;
 Ican = edge(B1,'canny');
 figure; imshow(Ican,[]);
 title('Detekcja krawędzi filtrem Cannego')

@@ -8,6 +8,7 @@ k = (0:N-1); n = (0:N-1);                 % k-kolumny/funkcje, n-wiersze/probki
 A = sqrt(1/N)*exp(-1j*2*pi/N*k'*n);       % macierz analizy
 S = A';                                   % macierz syntezy: transpozycja A
 
+
 % Sprawdzenie ortonormalności: S * A powinno być macierzą jednostkową
 orthonormal_check = S * A;
 disp('Sprawdzenie ortonormalności (S * A):');
